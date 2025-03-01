@@ -2,10 +2,11 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "composer install && php artisan migrate:fresh --seed && npm ci && npm run build"
+    "buildCommand": "composer install && php artisan migrate:fresh --seed --force"
   },
   "deploy": {
     "restartPolicyType": "ON_FAILURE",
-    "restartPolicyMaxRetries": 3
+    "restartPolicyMaxRetries": 3,
+    "startCommand": "vendor/bin/heroku-php-apache2 public/"
   }
 } 
