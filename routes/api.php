@@ -7,6 +7,7 @@ use App\Http\Controllers\API\GigController;
 use App\Http\Controllers\API\OrderController;
 use App\Http\Controllers\API\MessageController;
 use App\Http\Controllers\API\ReviewController;
+use App\Http\Controllers\AuditController;
 
 /*
 |--------------------------------------------------------------------------
@@ -45,10 +46,12 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
     
-    // Gig management
-    Route::post('/gigs', [GigController::class, 'store']);
-    Route::put('/gigs/{gig}', [GigController::class, 'update']);
-    Route::delete('/gigs/{gig}', [GigController::class, 'destroy']);
+    // Gig management - requires create_gig permission
+    Route::post('/gigs', [GigController::class, 'store'])->middleware('permission:create_gig');
+    
+    // Gig owner can update and delete their own gigs (controller should verify ownership)
+    Route::put('/gigs/{gig}', [GigController::class, 'update'])->middleware('permission:edit_gig');
+    Route::delete('/gigs/{gig}', [GigController::class, 'destroy'])->middleware('permission:delete_gig');
     
     // Order management
     Route::resource('/orders', OrderController::class);
@@ -61,9 +64,28 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/messages/{messageId}/read', [MessageController::class, 'markAsRead']);
     
     // Review system
-    Route::post('/reviews/order/{orderId}', [ReviewController::class, 'createReview']);
-    Route::put('/reviews/{reviewId}', [ReviewController::class, 'updateReview']);
-    Route::delete('/reviews/{reviewId}', [ReviewController::class, 'deleteReview']);
+    Route::post('/reviews/order/{orderId}', [ReviewController::class, 'createReview'])->middleware('permission:create_review');
+    Route::put('/reviews/{reviewId}', [ReviewController::class, 'updateReview'])->middleware('permission:edit_review');
+    Route::delete('/reviews/{reviewId}', [ReviewController::class, 'deleteReview'])->middleware('permission:delete_review');
+    
+    // Audit routes - only accessible by admin and moderator roles
+    Route::middleware('role:admin,moderator')->group(function () {
+        Route::get('/audits', [AuditController::class, 'index']);
+        Route::get('/audits/user', [AuditController::class, 'userAudits']);
+        Route::get('/audits/{model}/{id}', [AuditController::class, 'modelAudits']);
+    });
+    
+    // Admin-only routes
+    Route::middleware('role:admin')->group(function () {
+        // User management routes
+        Route::get('/admin/users', [AuthController::class, 'listUsers']);
+        Route::get('/admin/users/{user}', [AuthController::class, 'showUser']);
+        Route::put('/admin/users/{user}/role', [AuthController::class, 'updateUserRole']);
+        Route::delete('/admin/users/{user}', [AuthController::class, 'deleteUser']);
+        
+        // System statistics
+        Route::get('/admin/stats', [AuthController::class, 'systemStats']);
+    });
     
     // Logout
     Route::post('/logout', [AuthController::class, 'logout']);

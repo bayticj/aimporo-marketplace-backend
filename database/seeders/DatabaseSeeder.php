@@ -15,9 +15,10 @@ class DatabaseSeeder extends Seeder
     {
         // Call seeders in the correct order
         $this->call([
-            UsersTableSeeder::class,      // First create users
-            CategoriesTableSeeder::class, // Then create categories
-            GigsTableSeeder::class,       // Then create gigs using users and categories
+            RolesAndPermissionsSeeder::class, // First create roles and permissions
+            UsersTableSeeder::class,          // Then create users
+            CategoriesTableSeeder::class,     // Then create categories
+            GigsTableSeeder::class,           // Then create gigs using users and categories
         ]);
     }
 }

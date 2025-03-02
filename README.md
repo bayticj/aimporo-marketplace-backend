@@ -1,66 +1,164 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Aimporo Marketplace - Laravel Backend
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This is the backend API for the Aimporo Marketplace application, built with Laravel. It includes features such as audit logging, two-factor authentication, role-based permissions, and error tracking with Sentry.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Authentication**: Laravel Sanctum for API authentication
+- **Two-Factor Authentication**: Using Laravel Fortify
+- **Role-Based Access Control**: Using Spatie's Laravel Permission package
+- **Audit Logging**: Track changes to models
+- **Error Tracking**: Integration with Sentry
+- **API Endpoints**: RESTful API for gigs, orders, messages, reviews, and more
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Requirements
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.1 or higher
+- Composer
+- MySQL 5.7 or higher
+- Node.js and NPM (for frontend)
 
-## Learning Laravel
+## Installation
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd laravel-app
+   ```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+2. Install dependencies:
+   ```bash
+   composer install
+   ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+3. Copy the environment file:
+   ```bash
+   cp .env.example .env
+   ```
 
-## Laravel Sponsors
+4. Configure your `.env` file with your database credentials and other settings:
+   ```
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=your_database
+   DB_USERNAME=your_username
+   DB_PASSWORD=your_password
+   
+   SENTRY_LARAVEL_DSN=your_sentry_dsn
+   ```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+5. Run the setup command:
+   ```bash
+   php artisan app:setup
+   ```
 
-### Premium Partners
+   This will:
+   - Run migrations
+   - Seed the database with roles and permissions
+   - Clear cache
+   - Generate application key
+   - Optimize the application
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+6. Start the development server:
+   ```bash
+   php artisan serve
+   ```
 
-## Contributing
+## Default Credentials
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+After running the setup command, you can log in with the following credentials:
 
-## Code of Conduct
+- **Email**: admin@example.com
+- **Password**: password
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Role-Based Access Control
 
-## Security Vulnerabilities
+The application includes the following roles:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- **Admin**: Full access to all features
+- **Moderator**: Can moderate content and view audit logs
+- **Seller**: Can create and manage gigs, complete orders
+- **Buyer**: Can place orders, leave reviews
+- **User**: Basic access (view gigs and reviews)
+
+## API Routes
+
+### Public Routes
+
+- `POST /api/register`: Register a new user
+- `POST /api/login`: Login and get access token
+- `GET /api/gigs`: List all gigs
+- `GET /api/gigs/{gig}`: View a specific gig
+- `GET /api/reviews/gig/{gigId}`: Get reviews for a gig
+- `GET /api/reviews/user/{userId}`: Get reviews for a user
+
+### Protected Routes
+
+All protected routes require authentication using a Bearer token.
+
+#### User Routes
+
+- `GET /api/user`: Get authenticated user details
+- `POST /api/logout`: Logout (revoke token)
+
+#### Gig Routes
+
+- `POST /api/gigs`: Create a new gig (requires `create_gig` permission)
+- `PUT /api/gigs/{gig}`: Update a gig (requires `edit_gig` permission)
+- `DELETE /api/gigs/{gig}`: Delete a gig (requires `delete_gig` permission)
+
+#### Order Routes
+
+- `GET /api/orders`: List user's orders
+- `POST /api/orders`: Create a new order
+- `GET /api/orders/{order}`: View a specific order
+- `PUT /api/orders/{order}`: Update an order
+- `DELETE /api/orders/{order}`: Delete an order
+
+#### Review Routes
+
+- `POST /api/reviews/order/{orderId}`: Create a review (requires `create_review` permission)
+- `PUT /api/reviews/{reviewId}`: Update a review (requires `edit_review` permission)
+- `DELETE /api/reviews/{reviewId}`: Delete a review (requires `delete_review` permission)
+
+#### Message Routes
+
+- `GET /api/messages/conversations`: Get user's conversations
+- `GET /api/messages/unread-count`: Get count of unread messages
+- `GET /api/messages/order/{orderId}`: Get messages for an order
+- `POST /api/messages/order/{orderId}`: Send a message
+- `PUT /api/messages/{messageId}/read`: Mark a message as read
+
+#### Audit Routes (Admin/Moderator Only)
+
+- `GET /api/audits`: List all audit logs
+- `GET /api/audits/user`: Get audit logs for current user
+- `GET /api/audits/{model}/{id}`: Get audit logs for a specific model
+
+#### Admin Routes (Admin Only)
+
+- `GET /api/admin/users`: List all users
+- `GET /api/admin/users/{user}`: View a specific user
+- `PUT /api/admin/users/{user}/role`: Update a user's role
+- `DELETE /api/admin/users/{user}`: Delete a user
+- `GET /api/admin/stats`: Get system statistics
+
+## Two-Factor Authentication
+
+Two-factor authentication is implemented using Laravel Fortify. Users can enable 2FA from their account settings.
+
+## Error Tracking with Sentry
+
+The application is integrated with Sentry for error tracking. Make sure to set your Sentry DSN in the `.env` file.
+
+## Security
+
+- All sensitive information is stored in the `.env` file, which is not tracked by Git
+- API routes are protected with appropriate middleware
+- Role-based access control ensures users can only access what they're authorized to
+- Two-factor authentication adds an extra layer of security
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is licensed under the MIT License.
